@@ -12,7 +12,6 @@ Este projeto se conecta ao backend (NestJS) para envio e recebimento de mensagen
 - **[Vite](https://vitejs.dev/)** — Build tool rápida para desenvolvimento.
 - **[TypeScript](https://www.typescriptlang.org/)** — Tipagem estática.
 - **[Axios](https://axios-http.com/)** — Cliente HTTP para comunicação com a API.
-- **[TailwindCSS](https://tailwindcss.com/)** — Estilização moderna e responsiva.
 
 ---
 
