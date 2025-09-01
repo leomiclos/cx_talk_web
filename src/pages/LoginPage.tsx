@@ -3,8 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from 'jwt-decode';
-
+import { jwtDecode } from "jwt-decode";
 
 export default function LoginPage({
   onLogin,
@@ -13,15 +12,18 @@ export default function LoginPage({
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); 
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
+  const toRegister = () => {
+    navigate("/register");
+  };
 
   const handleLogin = async () => {
-    setError(""); 
-    
+    setError("");
+
     if (!email.trim() || !password.trim()) {
       setError("Preencha todos os campos!");
       return;
@@ -32,7 +34,7 @@ export default function LoginPage({
         email: email.trim(),
         password: password.trim(),
       });
-      
+
       const { access_token } = res.data;
 
       if (!access_token) {
@@ -40,10 +42,13 @@ export default function LoginPage({
         return;
       }
 
-    
       try {
-        const decoded = jwtDecode<{ sub: string; name: string; email: string; exp: number }>(access_token);
-        
+        const decoded = jwtDecode<{
+          sub: string;
+          name: string;
+          email: string;
+          exp: number;
+        }>(access_token);
 
         const currentTime = Date.now() / 1000;
         if (decoded.exp <= currentTime) {
@@ -51,29 +56,30 @@ export default function LoginPage({
           return;
         }
 
-       
         Cookies.set("token", access_token, { expires: 1 });
-        
-        const user = { id: decoded.sub, name: decoded.name, email: decoded.email };
-        setError(""); 
+
+        const user = {
+          id: decoded.sub,
+          name: decoded.name,
+          email: decoded.email,
+        };
+        setError("");
         onLogin(user);
         navigate("/chat");
-        
       } catch {
         setError("Token inválido recebido do servidor. Tente novamente.");
         return;
       }
-
     } catch (err: any) {
       console.error("Erro no login:", err);
-      
+
       if (err.response?.status === 401) {
         setError("Email ou senha incorretos.");
       } else if (err.response?.status === 404) {
         setError("Usuário não encontrado.");
       } else if (err.response?.status >= 500) {
         setError("Erro no servidor. Tente novamente mais tarde.");
-      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+      } else if (err.code === "NETWORK_ERROR" || !err.response) {
         setError("Erro de conexão. Verifique sua internet.");
       } else {
         const message = err.response?.data?.message || "";
@@ -152,6 +158,22 @@ export default function LoginPage({
           }}
         >
           Entrar
+        </button>
+        <button
+          onClick={toRegister}
+          style={{
+            width: "100%",
+            padding: "0.5rem",
+            background: "#ffffffff",
+            color: "#ff0000ff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontWeight: "bold",
+            marginTop: "0.5rem",
+          }}
+        >
+          Registre-se
         </button>
       </div>
     </div>

@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 
 export default function App() {
@@ -64,6 +65,10 @@ export default function App() {
         <Route
           path="/login"
           element={<LoginPage onLogin={(user) => setUser(user)} />}
+        />
+        <Route
+          path="/register"
+          element={<RegisterPage />}
         />
         <Route
           path="/chat"
