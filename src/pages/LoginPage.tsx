@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 
+
 export default function LoginPage({
   onLogin,
 }: {
@@ -15,10 +16,11 @@ export default function LoginPage({
   const [error, setError] = useState(""); 
 
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
 
   const handleLogin = async () => {
-    setError(""); // Limpa erros anteriores
+    setError(""); 
     
     if (!email.trim() || !password.trim()) {
       setError("Preencha todos os campos!");
@@ -26,7 +28,7 @@ export default function LoginPage({
     }
 
     try {
-      const res = await axios.post("http://localhost:3000/auth/login", {
+      const res = await axios.post(`${API_URL}/auth/login`, {
         email: email.trim(),
         password: password.trim(),
       });
@@ -38,18 +40,18 @@ export default function LoginPage({
         return;
       }
 
-      // Verifica se o token é válido antes de salvar
+    
       try {
         const decoded = jwtDecode<{ sub: string; name: string; email: string; exp: number }>(access_token);
         
-        // Verifica se o token não expirou
+
         const currentTime = Date.now() / 1000;
         if (decoded.exp <= currentTime) {
           setError("Token expirado. Tente fazer login novamente.");
           return;
         }
 
-        // Salva o token apenas se for válido
+       
         Cookies.set("token", access_token, { expires: 1 });
         
         const user = { id: decoded.sub, name: decoded.name, email: decoded.email };

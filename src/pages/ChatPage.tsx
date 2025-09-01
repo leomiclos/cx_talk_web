@@ -3,6 +3,8 @@ import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
 import type { Message } from "../interfaces/message";
 import type { User } from "../interfaces/user";
+import { toast } from 'react-toastify';
+
 
 // Error Boundary para capturar erros de renderização
 interface ErrorBoundaryState {
@@ -50,9 +52,11 @@ export default function ChatPage({ user, onLogout }: { user: User; onLogout: () 
 
   useEffect(() => {
     const token = Cookies.get("token");
+    const API_URL = import.meta.env.VITE_API_URL;
+
     if (!token) return;
 
-    const s: Socket = io("http://localhost:3000", {
+    const s: Socket = io(`${API_URL}`, {
       extraHeaders: {
         Authorization: `Bearer ${token}`,
       },
@@ -84,6 +88,15 @@ export default function ChatPage({ user, onLogout }: { user: User; onLogout: () 
       }
     });
 
+    // Escuta eventos de entrada e saída de usuários
+    s.on("user:joined", (data: { userId: string; userName: string; userEmail: string; timestamp: string }) => {
+      toast.success(`${data.userName} entrou no chat`);
+    });
+
+    s.on("user:left", (data: { userId: string; userName: string; userEmail: string; timestamp: string }) => {
+      toast.warning(`${data.userName} saiu do chat`);
+    });
+
     setSocket(s);
 
     return () => {
@@ -100,7 +113,6 @@ export default function ChatPage({ user, onLogout }: { user: User; onLogout: () 
       return;
     }
     
-    console.log('Enviando mensagem:', { text });
     socket.emit("message", { text });
     setText("");
   };
@@ -275,9 +287,9 @@ export default function ChatPage({ user, onLogout }: { user: User; onLogout: () 
         }
 
         .messages-list {
-          height: 100%;
+          height: 95%;
           overflow-y: auto;
-          padding: 20px;
+          padding: 20px 20px;
           display: flex;
           flex-direction: column;
           gap: 12px;
